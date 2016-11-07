@@ -28,8 +28,8 @@ Datatable.prototype.orderBy = function orderBy(config) {
 Datatable.prototype.paginate = function paginate(config) {
   if (!_.isUndefined(config.start) && !_.isUndefined(config.length)) {
     return {
-      offset: config.start,
-      limit: config.length,
+      offset: Number(config.start),
+      limit: Number(config.length),
     };
   }
 
@@ -38,7 +38,7 @@ Datatable.prototype.paginate = function paginate(config) {
 
 Datatable.prototype.search = function search(model, config) {
   if (_.isUndefined(config.search) || !config.search.value) {
-    return {};
+    return Promise.resolve({});
   }
 
   return model.describe().then((description) => {
@@ -55,7 +55,8 @@ Datatable.prototype.search = function search(model, config) {
           col => col.data === item && col.searchable && !!col.data);
 
         return isCharField && matchColumn;
-      });
+      })
+      .value();
 
     const possibleNumericTypes = [`INTEGER`, `DECIMAL`, `FLOAT`, `DOUBLE`];
 
@@ -74,9 +75,7 @@ Datatable.prototype.search = function search(model, config) {
     }));
 
     return {
-      result: {
-        $or: _.concat(numberSearch, stringSearch),
-      },
+      $or: _.concat(numberSearch, stringSearch),
     };
   });
 };
@@ -100,7 +99,7 @@ Datatable.prototype.mergeParams = function mergeParams(model, config, params) {
         };
       }
 
-      const orderParams = { order: this.orderBy(config) };
+      const orderParams = { order: [this.orderBy(config)] };
       const paginateParams = this.paginate(config);
 
       return _.merge(params, searchParams, orderParams, paginateParams);
@@ -108,7 +107,7 @@ Datatable.prototype.mergeParams = function mergeParams(model, config, params) {
 };
 
 Datatable.prototype.getResult = function getResult() {
-  this.mergeParams(this.model, this.config.this.params)
+  return this.mergeParams(this.model, this.config, this.params)
     .then(params =>
       Promise.all([
         this.model.count({}),
@@ -116,6 +115,7 @@ Datatable.prototype.getResult = function getResult() {
       ]))
     .then((result) => {
       const response = {
+        draw: Number(this.config.draw),
         data: result[1].rows,
         recordsFiltered: result[1].count,
         recordsTotal: result[0],
