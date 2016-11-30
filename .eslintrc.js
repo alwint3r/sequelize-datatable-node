@@ -12,5 +12,6 @@ module.exports = {
     "rules": {
       "strict": 0,
       "quotes": [2, `backtick`],
+      "comma-dangle": 0,
     }
 };
