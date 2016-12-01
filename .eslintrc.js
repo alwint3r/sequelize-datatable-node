@@ -8,6 +8,7 @@ module.exports = {
     ],
     "env": {
       "node": true,
+      "mocha": true,
     },
     "rules": {
       "strict": 0,
