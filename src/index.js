@@ -85,6 +85,7 @@ function getResult(model, config, modelParams) {
       data: _.map(result[1].rows, row => row.toJSON()),
       recordsFiltered: result[1].count,
       recordsTotal: result[0],
+      _: config._,
     }));
 }
 
