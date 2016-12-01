@@ -2,6 +2,10 @@
 
 const _ = require(`lodash`);
 
+function boolify(booleanalike) {
+  return booleanalike === `true`;
+}
+
 function stringSearch(modelDesc, config) {
   const fields = _(modelDesc)
     .keys()
@@ -14,7 +18,7 @@ function stringSearch(modelDesc, config) {
 
       const matchColumn = _.filter(
         config.columns,
-        column => column.data === item && column.searchable && !!column.data
+        column => column.data === item && boolify(column.searchable) && !!column.data
       );
 
       return isCharField && matchColumn.length > 0;
@@ -35,7 +39,7 @@ function numberSearch(modelDesc, config) {
       const matchColumn = _.filter(
         config.columns,
         column => column.data === item
-          && column.searchable
+          && boolify(column.searchable)
           && !_.isNaN(Number(config.search.value))
       );
 

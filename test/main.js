@@ -120,5 +120,31 @@ describe(`datatable(model, config, params)`, function top() {
           return true;
         });
     });
+
+    it(`Should produce expected output with numeric search`, () => {
+      const expected = storedData.slice(1);
+      const request = _.cloneDeep(mockRequest);
+      request.columns = _.map(request.columns, (col) => {
+        if (col.data === `no`) {
+          return col;
+        }
+
+        const cloned = _.cloneDeep(col);
+        cloned.searchable = `false`;
+
+        return cloned;
+      });
+      request.search = {
+        value: 2,
+        regex: false,
+      };
+
+      return datatable(models.customer, request, {})
+        .then((result) => {
+          expect(result.data).to.deep.equal(expected);
+
+          return true;
+        });
+    });
   });
 });
