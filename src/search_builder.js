@@ -8,7 +8,7 @@ function stringSearch(modelDesc, config) {
     .filter((item) => {
       const field = modelDesc[item];
       const isCharField = (
-        field.type.indexOf(`CHARACTER`) > -1 &&
+        field.type.indexOf(`CHARACTER`) > -1 ||
         field.type.indexOf(`VARCHAR`) > -1
       );
 
@@ -17,7 +17,7 @@ function stringSearch(modelDesc, config) {
         column => column.data === item && column.searchable && !!column.data
       );
 
-      return isCharField && matchColumn;
+      return isCharField && matchColumn.length > 0;
     })
     .value();
 
@@ -34,10 +34,12 @@ function numberSearch(modelDesc, config) {
       const isNumeric = possibleNumericTypes.indexOf(modelDesc[item].type) > -1;
       const matchColumn = _.filter(
         config.columns,
-        column => column.data === item && column.searchable && !_.isNaN(Number(column.data))
+        column => column.data === item
+          && column.searchable
+          && !_.isNaN(Number(config.search.value))
       );
 
-      return isNumeric && matchColumn;
+      return isNumeric && matchColumn.length > 0;
     })
     .value();
 
