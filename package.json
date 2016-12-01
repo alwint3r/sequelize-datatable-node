@@ -4,11 +4,9 @@
   "description": "Server-side datatables with sequelize",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha ; npm run remove-container",
+    "test": "mocha",
     "build-docker": "docker build -t sequelize-datatables-postgres .",
-    "run-docker": "docker run --name docker-sequelize-datatables-test -p 5432:5432 -d sequelize-datatables-postgres",
-    "pretest": "npm run build-docker && npm run run-docker && sleep 10",
-    "remove-container": "docker rm -f docker-sequelize-datatables-test"
+    "run-docker": "npm run build-docker && docker run --name docker-sequelize-datatables-test -p 5432:5432 --rm sequelize-datatables-postgres"
   },
   "keywords": [
     "sequelize",
@@ -32,6 +30,7 @@
     "eslint-plugin-react": "^6.6.0",
     "mocha": "^3.2.0",
     "pg": "^6.1.0",
+    "pg-native": "^1.10.0",
     "sequelize": "^3.27.0"
   }
 }

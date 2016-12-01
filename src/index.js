@@ -11,7 +11,7 @@ function orderBy(config) {
   const order = config.order[0];
 
   return [
-    this.config.columns[order.column].data,
+    config.columns[order.column].data,
     order.dir.toUpperCase(),
   ];
 }
@@ -82,13 +82,13 @@ function getResult(model, config, modelParams) {
       ]))
     .then(result => ({
       draw: Number(config.draw),
-      data: result[1].rows,
+      data: _.map(result[1].rows, row => row.toJSON()),
       recordsFiltered: result[1].count,
       recordsTotal: result[0],
     }));
 }
 
-function DataTable(model, config, modelParams) {
+function dataTable(model, config, modelParams) {
   if (!model || !config) {
     return Promise.reject(new Error(`Model and config should be provided`));
   }
@@ -96,4 +96,4 @@ function DataTable(model, config, modelParams) {
   return getResult(model, config, modelParams || {});
 }
 
-module.exports = DataTable;
+module.exports = dataTable;
