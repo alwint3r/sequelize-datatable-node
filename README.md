@@ -6,7 +6,7 @@ Server-side processing datatables with sequelize.
 #### API
 
 ```
-datatable(model: SequelizeModel required, config: Object required, params: Object) -> Object
+datatable(model: SequelizeModel required, config: Object required, params: Object) -> Promise<Object>
 ```
 
 This function takes three arguments to produce output for datatables.
