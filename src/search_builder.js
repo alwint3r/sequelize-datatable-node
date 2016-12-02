@@ -2,9 +2,7 @@
 
 const _ = require(`lodash`);
 
-function boolify(booleanalike) {
-  return booleanalike === `true`;
-}
+const helper = require(`./helper`);
 
 function stringSearch(modelDesc, config) {
   const fields = _(modelDesc)
@@ -18,7 +16,7 @@ function stringSearch(modelDesc, config) {
 
       const matchColumn = _.filter(
         config.columns,
-        column => column.data === item && boolify(column.searchable) && !!column.data
+        column => column.data === item && helper.boolify(column.searchable) && !!column.data
       );
 
       return isCharField && matchColumn.length > 0;
@@ -26,7 +24,7 @@ function stringSearch(modelDesc, config) {
     .value();
 
   return _.map(fields, field => ({
-    [field]: { $like: `%${config.search.value}%` },
+    [helper.transformFieldname(field)]: { $like: `%${config.search.value}%` },
   }));
 }
 
@@ -39,7 +37,7 @@ function numberSearch(modelDesc, config) {
       const matchColumn = _.filter(
         config.columns,
         column => column.data === item
-          && boolify(column.searchable)
+          && helper.boolify(column.searchable)
           && !_.isNaN(Number(config.search.value))
       );
 
@@ -48,7 +46,7 @@ function numberSearch(modelDesc, config) {
     .value();
 
   return _.map(fields, field => ({
-    [field]: Number(config.search.value),
+    [helper.transformFieldname(field)]: Number(config.search.value),
   }));
 }
 

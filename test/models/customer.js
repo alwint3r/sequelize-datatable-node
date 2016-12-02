@@ -1,8 +1,9 @@
 'use strict';
 
 const Sequelize = require(`sequelize`);
+const db = require(`../helpers/db`)();
 
-module.exports = db => db.define(`customer`, {
+module.exports = db.define(`customer`, {
   no: {
     type: Sequelize.INTEGER,
     primaryKey: true,

@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require(`lodash`);
+const Sequelize = require(`sequelize`);
 const searchBuilder = require(`./search_builder`);
 
 function orderBy(config) {
@@ -11,7 +12,7 @@ function orderBy(config) {
   const order = config.order[0];
 
   return [
-    config.columns[order.column].data,
+    Sequelize.col(config.columns[order.column].data),
     order.dir.toUpperCase(),
   ];
 }

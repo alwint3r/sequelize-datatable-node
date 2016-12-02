@@ -3,6 +3,11 @@ Sequelize Datatables
 
 Server-side processing datatables with sequelize.
 
+#### Support
+
+* Node.js v4 & later
+* Sequelize v3
+
 #### API
 
 ```

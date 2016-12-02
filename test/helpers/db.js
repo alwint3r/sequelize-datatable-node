@@ -5,6 +5,7 @@ const config = {
   host: `localhost`,
   port: 5432,
   dialect: `postgres`,
+  logging: () => {},
 };
 
 let db;
