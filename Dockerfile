@@ -16,7 +16,6 @@ ENV PGDATA /var/lib/postgresql/data
 VOLUME /var/lib/postgresql/data
 
 COPY test-docker-entrypoint.sh /
-COPY test.sql /
 
 RUN chmod 755 /test-docker-entrypoint.sh
 

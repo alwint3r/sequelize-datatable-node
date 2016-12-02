@@ -1,4 +1,6 @@
 #!/bin/sh
+
+# copied from https://github.com/kiasaki/docker-alpine-postgres
 chown -R postgres "$PGDATA"
 
 if [ -z "$(ls -A "$PGDATA")" ]; then
@@ -58,5 +60,4 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
     { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA"/pg_hba.conf
 fi
 
-cat test.sql | gosu postgres postgres --single -jE
 exec gosu postgres "$@"
