@@ -11,6 +11,10 @@ function orderBy(config) {
 
   const order = config.order[0];
 
+  if (!order) {
+    return [];
+  }
+
   return [
     Sequelize.col(config.columns[order.column].data),
     order.dir.toUpperCase(),
@@ -48,6 +52,20 @@ function search(model, config) {
   }));
 }
 
+function buildAttributes(config) {
+  const columns = config.columns;
+
+  const filtered = _.filter(columns, col => col.data.indexOf(`.`) < 0);
+
+  return _.map(filtered, (col) => {
+    if (col.data.indexOf(`.`) > -1) {
+      return Sequelize.col(col.data);
+    }
+
+    return col.data;
+  });
+}
+
 function mergeParams(model, config, modelParams) {
   return search(model, config)
     .then((searchParams) => {
@@ -67,10 +85,18 @@ function mergeParams(model, config, modelParams) {
         };
       }
 
-      const orderParams = { order: [orderBy(config)] };
+      const orderParams = orderBy(config).length > 1 ? { order: [orderBy(config)] } : {};
       const paginateParams = paginate(config);
+      const attributeParams = { attributes: buildAttributes(config) };
+      const merged = _.merge(
+        {},
+        attributeParams,
+        modelParams,
+        newSearchParams,
+        orderParams,
+        paginateParams);
 
-      return _.merge(modelParams, newSearchParams, orderParams, paginateParams);
+      return merged;
     });
 }
 
