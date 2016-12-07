@@ -41,4 +41,39 @@ describe(` > 1 joined table`, function top() {
       return datatable(models.customer, request, params);
     });
   });
+
+  describe(`With search`, () => {
+    it(`Should not output error`, () => {
+      const request = _.cloneDeep(mockRelationalRequest);
+      request.columns.push({
+        data: `Card.cc_masked`,
+        name: ``,
+        searchable: `true`,
+        orderable: `true`,
+        search: {
+          value: ``,
+          regex: `false`,
+        },
+      });
+
+      request.search.value = `442671`;
+
+      const params = {
+        include: [
+          {
+            model: models.account,
+            as: `Account`,
+            required: true,
+          },
+          {
+            model: models.card,
+            as: `Card`,
+            required: true,
+          },
+        ],
+      };
+
+      return datatable(models.customer, request, params);
+    });
+  });
 });
