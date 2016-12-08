@@ -181,7 +181,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRelationalRequest);
         request.order = [
           {
-            column: 5,
+            column: request.columns.length - 1,
             dir: `asc`,
           },
         ];

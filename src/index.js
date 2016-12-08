@@ -3,8 +3,10 @@
 const _ = require(`lodash`);
 const Sequelize = require(`sequelize`);
 const searchBuilder = require(`./search_builder`);
+const helper = require(`./helper`);
+const Promise = require(`bluebird`);
 
-function orderBy(config) {
+function orderBy(config, desc) {
   if (!config.order) {
     return [];
   }
@@ -15,10 +17,21 @@ function orderBy(config) {
     return [];
   }
 
+  const col = config.columns[order.column].data;
+  const colExists = _.filter(_.keys(desc), name => name === helper.transformFieldname(col));
+
+  if (colExists.length < 1) {
+    return [];
+  }
+
   return [
-    Sequelize.col(config.columns[order.column].data),
+    Sequelize.col(helper.transformFieldname(col)),
     order.dir.toUpperCase(),
   ];
+}
+
+function describe(model) {
+  return model.describe();
 }
 
 function paginate(config) {
@@ -44,7 +57,7 @@ function search(model, config) {
     return Promise.resolve({});
   }
 
-  return model.describe().then(description => ({
+  return describe(model).then(description => ({
     $or: _.concat(
       searchBuilder.string(description, config),
       searchBuilder.number(description, config)
@@ -68,7 +81,15 @@ function buildAttributes(config) {
 
 function mergeParams(model, config, modelParams) {
   return search(model, config)
-    .then((searchParams) => {
+    .then(searchParams =>
+      describe(model).then(desc => ({
+        search: searchParams,
+        order: orderBy(config, desc),
+      })))
+    .then((result) => {
+      const searchParams = result.search;
+      const order = result.order;
+
       let newSearchParams = {};
       if (modelParams.where) {
         newSearchParams = {
@@ -85,27 +106,37 @@ function mergeParams(model, config, modelParams) {
         };
       }
 
-      const orderParams = orderBy(config).length > 1 ? { order: [orderBy(config)] } : {};
-      const paginateParams = paginate(config);
-      const attributeParams = { attributes: buildAttributes(config) };
-      const merged = _.merge(
-        {},
-        attributeParams,
-        modelParams,
-        newSearchParams,
-        orderParams,
-        paginateParams);
+      const params = modelParams;
 
-      return merged;
+      if (order.length > 0) {
+        params.order = [order];
+      }
+
+      params.where = _.merge(params.where, newSearchParams.where);
+
+      return params;
     });
 }
 
 function getResult(model, config, modelParams) {
-  return mergeParams(model, config, modelParams)
-    .then(params =>
+  const duplicateParams = modelParams;
+  const attributeParams = { attributes: buildAttributes(config) };
+
+  const leaves = helper.dfs(duplicateParams, [], []);
+
+  return Promise.each(leaves, leaf =>
+      mergeParams(leaf.model || model, config, leaf)
+    )
+    .then(() => _.assign(duplicateParams, paginate(config), attributeParams))
+    // .then(params => {
+    //   console.log('Final params', params);
+
+    //   return params;
+    // })
+    .then(() =>
       Promise.all([
         model.count({}),
-        model.findAndCountAll(params),
+        model.findAndCountAll(duplicateParams),
       ]))
     .then(result => ({
       draw: Number(config.draw),

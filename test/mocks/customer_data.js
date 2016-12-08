@@ -1,5 +1,3 @@
-const crypto = require(`crypto`);
-
 module.exports = [
   {
     no: 1,

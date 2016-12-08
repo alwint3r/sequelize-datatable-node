@@ -23,22 +23,32 @@ describe(` > 1 joined table`, function top() {
         },
       });
 
+      request.order = [{
+        column: `${request.columns.length - 1}`,
+        dir: `desc`,
+      }];
+
       const params = {
         include: [
           {
             model: models.account,
             as: `Account`,
-            required: true,
+            required: false,
           },
           {
             model: models.card,
             as: `Card`,
-            required: true,
+            required: false,
           },
         ],
       };
 
-      return datatable(models.customer, request, params);
+      return datatable(models.customer, request, params)
+        .then((result) => {
+          console.log(result);
+
+          return true;
+        });
     });
   });
 
@@ -56,24 +66,29 @@ describe(` > 1 joined table`, function top() {
         },
       });
 
-      request.search.value = `442671`;
+      request.search.value = `winter`;
 
       const params = {
         include: [
           {
             model: models.account,
             as: `Account`,
-            required: true,
+            required: false,
           },
           {
             model: models.card,
             as: `Card`,
-            required: true,
+            required: false,
           },
         ],
       };
 
-      return datatable(models.customer, request, params);
+      return datatable(models.customer, request, params)
+        .then((result) => {
+          console.log(`Result`, result);
+
+          return true;
+        });
     });
   });
 });
