@@ -108,7 +108,7 @@ describe(`datatable(model, config, params)`, function top() {
       });
 
       it(`Should produce expected output with numeric search`, () => {
-        const expected = customerData.slice(1);
+        const expected = customerData;
         const request = _.cloneDeep(mockRequest);
         request.columns = _.map(request.columns, (col) => {
           if (col.data === `no`) {

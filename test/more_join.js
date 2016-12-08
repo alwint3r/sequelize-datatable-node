@@ -43,12 +43,7 @@ describe(` > 1 joined table`, function top() {
         ],
       };
 
-      return datatable(models.customer, request, params)
-        .then((result) => {
-          console.log(result);
-
-          return true;
-        });
+      return datatable(models.customer, request, params);
     });
   });
 
@@ -56,7 +51,7 @@ describe(` > 1 joined table`, function top() {
     it(`Should not output error`, () => {
       const request = _.cloneDeep(mockRelationalRequest);
       request.columns.push({
-        data: `Card.cc_masked`,
+        data: `Account.email`,
         name: ``,
         searchable: `true`,
         orderable: `true`,
@@ -75,20 +70,10 @@ describe(` > 1 joined table`, function top() {
             as: `Account`,
             required: false,
           },
-          {
-            model: models.card,
-            as: `Card`,
-            required: false,
-          },
         ],
       };
 
-      return datatable(models.customer, request, params)
-        .then((result) => {
-          console.log(`Result`, result);
-
-          return true;
-        });
+      return datatable(models.customer, request, params);
     });
   });
 });

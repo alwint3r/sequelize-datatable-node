@@ -1,57 +1,85 @@
 'use strict';
 
 const _ = require(`lodash`);
-
 const helper = require(`./helper`);
 
-function stringSearch(modelDesc, config) {
-  const fields = _(modelDesc)
+const possibleNumericTypes = [`INTEGER`, `DECIMAL`, `FLOAT`, `DOUBLE`];
+const possibleStringTypes = [`CHARACTER VARYING`, `VARCHAR`];
+
+function charSearch(modelName, modelDesc, config) {
+  const columns = _.filter(config.columns, (col) => {
+    const modelAndColumn = helper.getModelAndColumn(col.data);
+
+    return modelName === modelAndColumn[0];
+  });
+  const nameMaps = _.reduce(columns, (acc, col) => _.merge(acc, {
+    [helper.getModelAndColumn(col.data)[1]]: col,
+  }), {});
+
+  const matchNames = _(modelDesc)
     .keys()
     .filter((item) => {
-      const field = modelDesc[item];
-      const isCharField = (
-        field.type.indexOf(`CHARACTER`) > -1 ||
-        field.type.indexOf(`VARCHAR`) > -1
-      );
+      const isChar = possibleStringTypes.indexOf(modelDesc[item].type) > -1;
 
-      const matchColumn = _.filter(
-        config.columns,
-        column => helper.transformFieldname(column.data) === item
-          && helper.boolify(column.searchable) && !!column.data
-      );
-
-      return isCharField && matchColumn.length > 0;
+      return isChar && nameMaps[item] && config.search.value;
     })
     .value();
 
-  return _.map(fields, field => ({
-    [helper.transformFieldname(field)]: { $like: `%${config.search.value}%` },
+  return _.map(matchNames, name => ({
+    [helper.searchify(nameMaps[name].data)]: { $like: `%${config.search.value}%` },
   }));
 }
 
-function numberSearch(modelDesc, config) {
-  const possibleNumericTypes = [`INTEGER`, `DECIMAL`, `FLOAT`, `DOUBLE`];
-  const fields = _(modelDesc)
+function numericSearch(modelName, modelDesc, config) {
+  const columns = _.filter(config.columns, (col) => {
+    const modelAndColumn = helper.getModelAndColumn(col.data);
+
+    return modelName === modelAndColumn[0];
+  });
+  const nameMaps = _.reduce(columns, (acc, col) => _.merge(acc, {
+    [helper.getModelAndColumn(col.data)[1]]: col,
+  }), {});
+
+  const matchNames = _(modelDesc)
     .keys()
     .filter((item) => {
       const isNumeric = possibleNumericTypes.indexOf(modelDesc[item].type) > -1;
-      const matchColumn = _.filter(
-        config.columns,
-        column => helper.transformFieldname(column.data) === item
-          && helper.boolify(column.searchable)
-          && !_.isNaN(Number(config.search.value))
-      );
 
-      return isNumeric && matchColumn.length > 0;
+      return isNumeric && nameMaps[item] && !_.isNaN(Number(config.search.value));
     })
     .value();
 
-  return _.map(fields, field => ({
-    [helper.transformFieldname(field)]: Number(config.search.value),
+  return _.map(matchNames, name => ({
+    [helper.searchify(nameMaps[name].data)]: Number(config.search.value),
+  }));
+}
+
+function booleanSearch(modelName, modelDesc, config) {
+  const columns = _.filter(config.columns, (col) => {
+    const modelAndColumn = helper.getModelAndColumn(col.data);
+
+    return modelName === modelAndColumn[0];
+  });
+  const nameMaps = _.reduce(columns, (acc, col) => _.merge(acc, {
+    [helper.getModelAndColumn(col.data)[1]]: col,
+  }), {});
+
+  const matchNames = _(modelDesc)
+    .keys()
+    .filter((item) => {
+      const isNumeric = possibleNumericTypes.indexOf(modelDesc[item].type) > -1;
+
+      return isNumeric && nameMaps[item] && helper.boolAlike(config.search.value);
+    })
+    .value();
+
+  return _.map(matchNames, name => ({
+    [helper.searchify(nameMaps[name].data)]: helper.boolify(config.search.value),
   }));
 }
 
 module.exports = {
-  string: stringSearch,
-  number: numberSearch,
+  numericSearch,
+  charSearch,
+  booleanSearch,
 };

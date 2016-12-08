@@ -3,12 +3,26 @@
 const _ = require(`lodash`);
 
 function boolify(booleanalike) {
+  if (typeof booleanalike === `boolean`) {
+    return booleanalike;
+  }
+
   return booleanalike === `true`;
 }
 
-function transformFieldname(field) {
+function getColumnName(field) {
   return field.indexOf(`.`) > -1
     ? field.split(`.`).pop()
+    : field;
+}
+
+function boolAlike(value) {
+  return (value === `true` || value === `false`) || typeof value === `boolean`;
+}
+
+function getModelName(field) {
+  return field.indexOf(`.`) > -1
+    ? field.split(`.`).shift()
     : field;
 }
 
@@ -26,8 +40,26 @@ function dfs(node, stack, visited) {
   return dfs(stack.pop(), stack, visited);
 }
 
+function searchify(column) {
+  return column.indexOf(`.`) > -1
+    ? `$${column}$`
+    : column;
+}
+
+function getModelAndColumn(column) {
+  if (column.indexOf(`.`) > -1) {
+    return column.split(`.`);
+  }
+
+  return [``, column];
+}
+
 module.exports = {
   boolify,
-  transformFieldname,
+  getColumnName,
+  searchify,
   dfs,
+  getModelName,
+  boolAlike,
+  getModelAndColumn,
 };

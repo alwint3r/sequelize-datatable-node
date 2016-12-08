@@ -1,34 +1,9 @@
 'use strict';
 
 const _ = require(`lodash`);
-const Sequelize = require(`sequelize`);
 const searchBuilder = require(`./search_builder`);
 const helper = require(`./helper`);
 const Promise = require(`bluebird`);
-
-function orderBy(config, desc) {
-  if (!config.order) {
-    return [];
-  }
-
-  const order = config.order[0];
-
-  if (!order) {
-    return [];
-  }
-
-  const col = config.columns[order.column].data;
-  const colExists = _.filter(_.keys(desc), name => name === helper.transformFieldname(col));
-
-  if (colExists.length < 1) {
-    return [];
-  }
-
-  return [
-    Sequelize.col(helper.transformFieldname(col)),
-    order.dir.toUpperCase(),
-  ];
-}
 
 function describe(model) {
   return model.describe();
@@ -52,91 +27,114 @@ function paginate(config) {
   };
 }
 
-function search(model, config) {
+function search(model, config, modelName) {
   if (_.isUndefined(config.search) || !config.search.value) {
     return Promise.resolve({});
   }
 
-  return describe(model).then(description => ({
-    $or: _.concat(
-      searchBuilder.string(description, config),
-      searchBuilder.number(description, config)
-    ),
-  }));
+  return describe(model).then(description => _.concat(
+      searchBuilder.charSearch(modelName, description, config),
+      searchBuilder.numericSearch(modelName, description, config),
+      searchBuilder.booleanSearch(modelName, description, config)
+    ));
 }
 
-function buildAttributes(config) {
-  const columns = config.columns;
+function buildSearch(model, config, params) {
+  const leaves = helper.dfs(params, [], []);
 
-  const filtered = _.filter(columns, col => col.data.indexOf(`.`) < 0);
+  if (_.isUndefined(config.search) || !config.search.value) {
+    return Promise.resolve({});
+  }
 
-  return _.map(filtered, (col) => {
-    if (col.data.indexOf(`.`) > -1) {
-      return Sequelize.col(col.data);
-    }
+  return Promise.map(leaves, leaf =>
+    search(leaf.model || model, config, leaf.as || ``)
+  ).then((result) => {
+    const objects = _.filter(result, res => _.isObject(res) && !_.isArray(res) && !_.isEmpty(res));
+    const arrays = _.filter(result, res => _.isArray(res) && !_.isEmpty(res));
 
-    return col.data;
+    const reducedArrays = _.reduce(arrays, (acc, val) => _.concat(acc, val), []);
+    const reducedObject = _.reduce(objects, (acc, val) => _.merge(acc, val), {});
+
+    const concatenated = {
+      $or: _.filter(_.concat(reducedArrays, reducedObject), res => !_.isEmpty(res)),
+    };
+
+    return concatenated;
   });
 }
 
-function mergeParams(model, config, modelParams) {
-  return search(model, config)
-    .then(searchParams =>
-      describe(model).then(desc => ({
-        search: searchParams,
-        order: orderBy(config, desc),
-      })))
-    .then((result) => {
-      const searchParams = result.search;
-      const order = result.order;
+function buildOrder(model, config, params) {
+  if (!config.order) {
+    return [];
+  }
 
-      let newSearchParams = {};
-      if (modelParams.where) {
-        newSearchParams = {
-          where: {
-            $and: [
-              modelParams.where,
-              searchParams,
-            ],
-          }
-        };
-      } else {
-        newSearchParams = {
-          where: searchParams,
-        };
-      }
+  const order = config.order[0];
+  const col = config.columns[order.column].data;
+  const leaves = helper.dfs(params, [], []);
 
-      const params = modelParams;
+  if (col.indexOf(`.`) > -1) {
+    const found = _.filter(leaves, leaf =>
+      leaf.as === helper.getModelName(col)
+    )[0];
 
-      if (order.length > 0) {
-        params.order = [order];
-      }
+    if (!found) {
+      return [];
+    }
 
-      params.where = _.merge(params.where, newSearchParams.where);
+    return [
+      {
+        model: found.model,
+        as: found.as,
+      },
+      helper.getColumnName(col),
+      order.dir.toUpperCase(),
+    ];
+  }
 
-      return params;
-    });
+  return [helper.getColumnName(col), order.dir.toUpperCase()];
 }
 
 function getResult(model, config, modelParams) {
-  const duplicateParams = modelParams;
-  const attributeParams = { attributes: buildAttributes(config) };
+  const params = modelParams;
 
-  const leaves = helper.dfs(duplicateParams, [], []);
+  /* mutate params */
+  return buildSearch(model, config, params)
+    .then((result) => {
+      if (_.isEmpty(result)) {
+        return params;
+      }
 
-  return Promise.each(leaves, leaf =>
-      mergeParams(leaf.model || model, config, leaf)
-    )
-    .then(() => _.assign(duplicateParams, paginate(config), attributeParams))
-    // .then(params => {
-    //   console.log('Final params', params);
+      if (params.where) {
+        params.where = {
+          $and: [
+            params.where,
+            result,
+          ],
+        };
+      } else {
+        params.where = result;
+      }
 
-    //   return params;
-    // })
-    .then(() =>
+      return params;
+    })
+    .then(() => {
+      const order = buildOrder(model, config, params);
+
+      return order;
+    })
+    .then((orderResult) => {
+      if (orderResult.length > 0) {
+        params.order = [orderResult];
+      }
+
+      _.assign(params, paginate(config));
+
+      return params;
+    })
+    .then(newParams =>
       Promise.all([
         model.count({}),
-        model.findAndCountAll(duplicateParams),
+        model.findAndCountAll(newParams),
       ]))
     .then(result => ({
       draw: Number(config.draw),
