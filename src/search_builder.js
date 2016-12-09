@@ -6,15 +6,23 @@ const helper = require(`./helper`);
 const possibleNumericTypes = [`INTEGER`, `DECIMAL`, `FLOAT`, `DOUBLE`];
 const possibleStringTypes = [`CHARACTER VARYING`, `VARCHAR`];
 
-function charSearch(modelName, modelDesc, config) {
-  const columns = _.filter(config.columns, (col) => {
-    const modelAndColumn = helper.getModelAndColumn(col.data);
+function filterColumns(modelName, config) {
+  return _.filter(config.columns, (col) => {
+    const modelAndColumn = _.takeRight(helper.getModelAndColumn(col.data), 2);
 
     return modelName === modelAndColumn[0];
   });
-  const nameMaps = _.reduce(columns, (acc, col) => _.merge(acc, {
-    [helper.getModelAndColumn(col.data)[1]]: col,
+}
+
+function createNameMaps(columns) {
+  return _.reduce(columns, (acc, col) => _.merge(acc, {
+    [helper.getModelAndColumn(col.data).pop()]: col,
   }), {});
+}
+
+function charSearch(modelName, modelDesc, config) {
+  const columns = filterColumns(modelName, config);
+  const nameMaps = createNameMaps(columns);
 
   const matchNames = _(modelDesc)
     .keys()
@@ -31,14 +39,8 @@ function charSearch(modelName, modelDesc, config) {
 }
 
 function numericSearch(modelName, modelDesc, config) {
-  const columns = _.filter(config.columns, (col) => {
-    const modelAndColumn = helper.getModelAndColumn(col.data);
-
-    return modelName === modelAndColumn[0];
-  });
-  const nameMaps = _.reduce(columns, (acc, col) => _.merge(acc, {
-    [helper.getModelAndColumn(col.data)[1]]: col,
-  }), {});
+  const columns = filterColumns(modelName, config);
+  const nameMaps = createNameMaps(columns);
 
   const matchNames = _(modelDesc)
     .keys()
@@ -55,14 +57,8 @@ function numericSearch(modelName, modelDesc, config) {
 }
 
 function booleanSearch(modelName, modelDesc, config) {
-  const columns = _.filter(config.columns, (col) => {
-    const modelAndColumn = helper.getModelAndColumn(col.data);
-
-    return modelName === modelAndColumn[0];
-  });
-  const nameMaps = _.reduce(columns, (acc, col) => _.merge(acc, {
-    [helper.getModelAndColumn(col.data)[1]]: col,
-  }), {});
+  const columns = filterColumns(modelName, config);
+  const nameMaps = createNameMaps(columns);
 
   const matchNames = _(modelDesc)
     .keys()
