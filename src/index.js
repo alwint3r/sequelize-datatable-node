@@ -27,19 +27,19 @@ function paginate(config) {
   };
 }
 
-function search(model, config, modelName) {
+function search(model, config, modelName, opt) {
   if (_.isUndefined(config.search) || !config.search.value) {
     return Promise.resolve({});
   }
 
   return describe(model).then(description => _.concat(
-      searchBuilder.charSearch(modelName, description, config),
-      searchBuilder.numericSearch(modelName, description, config),
-      searchBuilder.booleanSearch(modelName, description, config)
+      searchBuilder.charSearch(modelName, description, config, opt),
+      searchBuilder.numericSearch(modelName, description, config, opt),
+      searchBuilder.booleanSearch(modelName, description, config, opt)
     ));
 }
 
-function buildSearch(model, config, params) {
+function buildSearch(model, config, params, opt) {
   const leaves = helper.dfs(params, [], []);
 
   if (_.isUndefined(config.search) || !config.search.value) {
@@ -47,7 +47,7 @@ function buildSearch(model, config, params) {
   }
 
   return Promise.map(leaves, leaf =>
-    search(leaf.model || model, config, leaf.as || ``)
+    search(leaf.model || model, config, leaf.as || ``, opt)
   ).then((result) => {
     const objects = _.filter(result, res => _.isObject(res) && !_.isArray(res) && !_.isEmpty(res));
     const arrays = _.filter(result, res => _.isArray(res) && !_.isEmpty(res));
@@ -104,11 +104,11 @@ function buildOrder(model, config, params) {
   return [helper.getColumnName(col), order.dir.toUpperCase()];
 }
 
-function getResult(model, config, modelParams) {
+function getResult(model, config, modelParams, opt) {
   const params = modelParams;
 
   /* mutate params */
-  return buildSearch(model, config, params)
+  return buildSearch(model, config, params, opt)
     .then((result) => {
       if (_.isEmpty(result)) {
         return params;
@@ -155,12 +155,13 @@ function getResult(model, config, modelParams) {
     }));
 }
 
-function dataTable(model, config, modelParams) {
+function dataTable(model, config, modelParams, options) {
+  const opt = options || {};
   if (!model || !config) {
     return Promise.reject(new Error(`Model and config should be provided`));
   }
 
-  return getResult(model, config, modelParams || {});
+  return getResult(model, config, modelParams || {}, opt);
 }
 
 module.exports = dataTable;

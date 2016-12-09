@@ -20,7 +20,7 @@ function createNameMaps(columns) {
   }), {});
 }
 
-function charSearch(modelName, modelDesc, config) {
+function charSearch(modelName, modelDesc, config, opt) {
   const columns = filterColumns(modelName, config);
   const nameMaps = createNameMaps(columns);
 
@@ -33,8 +33,10 @@ function charSearch(modelName, modelDesc, config) {
     })
     .value();
 
+  const likeOp = opt.caseInsensitive ? `$ilike` : `$like`;
+
   return _.map(matchNames, name => ({
-    [helper.searchify(nameMaps[name].data)]: { $like: `%${config.search.value}%` },
+    [helper.searchify(nameMaps[name].data)]: { [likeOp]: `%${config.search.value}%` },
   }));
 }
 
