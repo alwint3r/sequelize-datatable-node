@@ -10,8 +10,13 @@ Server-side processing datatables with sequelize.
 
 #### API
 
-```
-datatable(model: SequelizeModel required, config: Object required, params: Object) -> Promise<Object>
+```js
+datatable(
+  model: SequelizeModel required,
+  config: Object required,
+  params: Object,
+  options: Object
+) -> Promise<Object>
 ```
 
 This function takes three arguments to produce output for datatables.
@@ -19,7 +24,15 @@ This function takes three arguments to produce output for datatables.
 * `model` - `required` - is the sequelize model.
 * `config` - `required` - is config sent by jQuery datatables to our server.
 * `params` - options for sequelize query.
+* `options` - library specific options. See below
 
+
+**Options**
+
+* `caseInsensitive: Boolean` - A flag for postgresql dialec. If this is set to `true`, `ILIKE` will be used instead of `LIKE` Default to `false`.
+
+
+#### Example Usage
 
 ```js
 const datatable = require(`sequelize-datatables`);
@@ -40,8 +53,10 @@ route.get(`/datasource`, (req, res) => {
 
  - [X] Test with postgresql database
  - [X] Support global search
+ - [X] Support nested relation search & ordering
  - [ ] Test with another database server (mysql, mssql, sqlite)
  - [ ] Support individual column search
+ - [ ] More tests!
 
 #### Testing
 
