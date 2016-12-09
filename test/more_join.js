@@ -9,7 +9,7 @@ const datatable = require(`../`);
 describe(` > 1 joined table`, function top() {
   this.timeout(10000);
 
-  describe(`With ordering on main table`, () => {
+  describe(`With ordering`, () => {
     it(`Should not output any error`, () => {
       const request = _.cloneDeep(mockRelationalRequest);
       request.columns.push({
@@ -25,7 +25,7 @@ describe(` > 1 joined table`, function top() {
 
       request.order = [{
         column: `${request.columns.length - 1}`,
-        dir: `desc`,
+        dir: `asc`,
       }];
 
       const params = {
@@ -69,6 +69,32 @@ describe(` > 1 joined table`, function top() {
             model: models.account,
             as: `Account`,
             required: false,
+          },
+        ],
+      };
+
+      return datatable(models.customer, request, params);
+    });
+
+    it(`Should not output any error`, () => {
+      const request = _.cloneDeep(mockRelationalRequest);
+      request.columns.push({
+        data: `Card.cc_masked`,
+        name: ``,
+        searchable: `true`,
+        orderable: `true`,
+        search: {
+          value: ``,
+          regex: `false`,
+        },
+      });
+
+      const params = {
+        include: [
+          {
+            model: models.card,
+            as: `Card`,
+            required: true,
           },
         ],
       };

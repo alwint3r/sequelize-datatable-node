@@ -73,22 +73,32 @@ function buildOrder(model, config, params) {
   const leaves = helper.dfs(params, [], []);
 
   if (col.indexOf(`.`) > -1) {
-    const found = _.filter(leaves, leaf =>
-      leaf.as === helper.getModelName(col)
-    )[0];
+    const splitted = col.split(`.`);
+    const colName = splitted.pop();
 
-    if (!found) {
+    const orders = _.compact(_.map(splitted, (modelName) => {
+      const found = _.filter(leaves, leaf =>
+        leaf.as === modelName
+      )[0];
+
+      if (!found) {
+        return false;
+      }
+
+      return {
+        model: found.model,
+        as: found.as,
+      };
+    }));
+
+    if (orders.length < 1) {
       return [];
     }
 
-    return [
-      {
-        model: found.model,
-        as: found.as,
-      },
-      helper.getColumnName(col),
-      order.dir.toUpperCase(),
-    ];
+    orders.push(colName);
+    orders.push(order.dir.toUpperCase());
+
+    return orders;
   }
 
   return [helper.getColumnName(col), order.dir.toUpperCase()];
