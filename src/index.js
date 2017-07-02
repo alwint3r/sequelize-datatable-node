@@ -32,8 +32,10 @@ function search(model, config, modelName, opt) {
     return Promise.resolve({});
   }
 
+  const dialect = helper.getDialectFromModel(model);
+
   return describe(model).then(description => _.concat(
-      searchBuilder.charSearch(modelName, description, config, opt),
+      searchBuilder.charSearch(modelName, description, config, opt, dialect),
       searchBuilder.numericSearch(modelName, description, config, opt),
       searchBuilder.booleanSearch(modelName, description, config, opt)
     ));

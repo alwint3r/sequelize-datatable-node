@@ -1,18 +1,16 @@
 'use strict';
 
 const Sequelize = require(`sequelize`);
-const config = {
-  host: `localhost`,
-  port: 5432,
-  dialect: `postgres`,
-  logging: () => {},
-};
+const config = require(`./db_config`);
 
 let db;
 
 module.exports = () => {
   if (!db) {
-    db = new Sequelize(`postgres`, `postgres`, null, config);
+    const username = config.credentials[0];
+    const password = config.credentials[1];
+    const database = config.db_name;
+    db = new Sequelize(database, username, password, config.db_config);
   }
 
   return db;

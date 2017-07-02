@@ -3,8 +3,20 @@
 const _ = require(`lodash`);
 const helper = require(`./helper`);
 
-const possibleNumericTypes = [`INTEGER`, `DECIMAL`, `FLOAT`, `DOUBLE`];
-const possibleStringTypes = [`CHARACTER VARYING`, `VARCHAR`];
+const possibleNumericTypes = [
+  `INTEGER`,
+  `DECIMAL`,
+  `FLOAT`,
+  `DOUBLE`,
+  `INT`,
+  `TINYINT`,
+];
+
+const possibleStringTypes = [`CHARACTER VARYING`, `VARCHAR`, `TEXT`, `CHAR`];
+
+function isTypeExists(typesList, item) {
+  return _.filter(typesList, type => item.indexOf(type) > -1).length > 0;
+}
 
 function filterColumns(modelName, config) {
   return _.filter(config.columns, (col) => {
@@ -20,20 +32,24 @@ function createNameMaps(columns) {
   }), {});
 }
 
-function charSearch(modelName, modelDesc, config, opt) {
+function charSearch(modelName, modelDesc, config, opt, dialect) {
   const columns = filterColumns(modelName, config);
   const nameMaps = createNameMaps(columns);
 
   const matchNames = _(modelDesc)
     .keys()
     .filter((item) => {
-      const isChar = possibleStringTypes.indexOf(modelDesc[item].type) > -1;
+      const isChar = isTypeExists(possibleStringTypes, modelDesc[item].type);
 
       return isChar && nameMaps[item] && config.search.value;
     })
     .value();
 
-  const likeOp = opt.caseInsensitive ? `$ilike` : `$like`;
+  let likeOp = opt.caseInsensitive ? `$ilike` : `$like`;
+
+  if (dialect === `mysql`) {
+    likeOp = `$like`;
+  }
 
   return _.map(matchNames, name => ({
     [helper.searchify(nameMaps[name].data)]: { [likeOp]: `%${config.search.value}%` },
@@ -47,7 +63,7 @@ function numericSearch(modelName, modelDesc, config) {
   const matchNames = _(modelDesc)
     .keys()
     .filter((item) => {
-      const isNumeric = possibleNumericTypes.indexOf(modelDesc[item].type) > -1;
+      const isNumeric = isTypeExists(possibleNumericTypes, modelDesc[item].type);
 
       return isNumeric && nameMaps[item] && !_.isNaN(Number(config.search.value));
     })
