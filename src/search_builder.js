@@ -10,9 +10,21 @@ const possibleNumericTypes = [
   `DOUBLE`,
   `INT`,
   `TINYINT`,
+  `BIGINT`,
+  `NUMBER`,
+  `REAL`,
 ];
 
-const possibleStringTypes = [`CHARACTER VARYING`, `VARCHAR`, `TEXT`, `CHAR`];
+const possibleStringTypes = [
+  `CHARACTER VARYING`,
+  `VARCHAR`,
+  `TEXT`,
+  `CHAR`,
+  `STRING`,
+  `TINYTEXT`,
+  `MEDIUMTEXT`,
+  `LONGTEXT`,
+];
 
 function isTypeExists(typesList, item) {
   return _.filter(typesList, type => item.indexOf(type) > -1).length > 0;
