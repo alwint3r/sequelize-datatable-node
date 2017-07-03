@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "$DIALECT" == "" ];
+then
+    echo "DIALECT environment variable should not be empty"
+    exit 1
+fi
+
+if [ "$DIALECT" == "postgres" ];
+then
+    docker pull postgres:alpine
+    docker run --name docker-sequelize-datatables-test-psql -p 5432:5432 --rm postgres:alpine
+fi
+
+if [ "$DIALECT" == "mysql" ];
+then
+    docker pull mysql:5
+    docker run --rm --name docker-sequelize-datatables-test-mysql -e MYSQL_USER=root -e MYSQL_PASSWORD= -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=sequelizedt -p 3306:3306 mysql:5
+fi

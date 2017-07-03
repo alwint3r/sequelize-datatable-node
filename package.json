@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha",
-    "build-docker": "docker build -t sequelize-datatables-postgres .",
-    "run-docker": "npm run build-docker && docker run --name docker-sequelize-datatables-test -p 5432:5432 --rm sequelize-datatables-postgres"
+    "run-docker": "./initialize-database-container"
   },
   "keywords": [
     "sequelize",
