@@ -1,6 +1,6 @@
 {
   "name": "sequelize-datatables",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Server-side datatables with sequelize",
   "main": "src/index.js",
   "scripts": {
