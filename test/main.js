@@ -1,6 +1,4 @@
-'use strict';
-
-const expect = require(`chai`).expect;
+const { expect } = require(`chai`);
 const _ = require(`lodash`);
 const datatable = require(`../`);
 const models = require(`./models`);
@@ -17,12 +15,11 @@ describe(`datatable(model, config, params)`, function top() {
       it(`Should output as expected`, () => {
         const expected = customerData;
 
-        return datatable(models.customer, mockRequest, {})
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, mockRequest, {}).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
 
       it(`Should produce result with correct ordering`, () => {
@@ -31,32 +28,30 @@ describe(`datatable(model, config, params)`, function top() {
         request.order = [
           {
             column: 0,
-            dir: `desc`,
-          },
+            dir: `desc`
+          }
         ];
 
-        return datatable(models.customer, request, {})
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, request, {}).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
 
       it(`Should produce expected result if where field inside params is given`, () => {
         const expected = customerData.slice(1);
         const params = {
           where: {
-            name: `winter`,
-          },
+            name: `winter`
+          }
         };
 
-        return datatable(models.customer, mockRequest, params)
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, mockRequest, params).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
 
       it(`Should produce limited result according to request param`, () => {
@@ -65,12 +60,11 @@ describe(`datatable(model, config, params)`, function top() {
         request.start = 1;
         request.length = 1;
 
-        return datatable(models.customer, request, {})
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, request, {}).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
     });
 
@@ -80,15 +74,14 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.search = {
           value: `Jane`,
-          regex: false,
+          regex: false
         };
 
-        return datatable(models.customer, request, {})
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, request, {}).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
 
       it(`Should produce expected output with numeric search`, () => {
@@ -96,21 +89,20 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.search = {
           value: 2,
-          regex: false,
+          regex: false
         };
 
-        return datatable(models.customer, request, {})
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, request, {}).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
 
       it(`Should produce expected output with numeric search`, () => {
         const expected = customerData;
         const request = _.cloneDeep(mockRequest);
-        request.columns = _.map(request.columns, (col) => {
+        request.columns = _.map(request.columns, col => {
           if (col.data === `no`) {
             return col;
           }
@@ -122,15 +114,14 @@ describe(`datatable(model, config, params)`, function top() {
         });
         request.search = {
           value: 2,
-          regex: false,
+          regex: false
         };
 
-        return datatable(models.customer, request, {})
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, request, {}).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
     });
   });
@@ -138,11 +129,11 @@ describe(`datatable(model, config, params)`, function top() {
   describe(`Querying table with join`, () => {
     const generallyExpected = [
       _.merge(_.cloneDeep(customerData[0]), {
-        Account: _.omit(accountData[0], [`password`]),
+        Account: _.omit(accountData[0], [`password`])
       }),
       _.merge(_.cloneDeep(customerData[1]), {
-        Account: _.omit(accountData[1], [`password`]),
-      }),
+        Account: _.omit(accountData[1], [`password`])
+      })
     ];
 
     describe(`Without search`, () => {
@@ -152,18 +143,17 @@ describe(`datatable(model, config, params)`, function top() {
             {
               model: models.account,
               as: `Account`,
-              attributes: [`email`, `active`],
-            },
-          ],
+              attributes: [`email`, `active`]
+            }
+          ]
         };
         const expected = generallyExpected.slice(0);
 
-        return datatable(models.customer, mockRelationalRequest, params)
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, mockRelationalRequest, params).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
 
       it(`Should produce output with correct ordering`, () => {
@@ -172,9 +162,9 @@ describe(`datatable(model, config, params)`, function top() {
             {
               model: models.account,
               as: `Account`,
-              attributes: [`email`, `active`],
-            },
-          ],
+              attributes: [`email`, `active`]
+            }
+          ]
         };
 
         const expected = _.reverse(generallyExpected.slice(0));
@@ -182,39 +172,37 @@ describe(`datatable(model, config, params)`, function top() {
         request.order = [
           {
             column: request.columns.length - 1,
-            dir: `asc`,
-          },
+            dir: `asc`
+          }
         ];
 
-        return datatable(models.customer, request, params)
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, request, params).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
 
       it(`Should produce expected result if where field inside params is given`, () => {
         const expected = generallyExpected.slice(0, 1);
         const params = {
           where: {
-            '$Account.active$': true,
+            '$Account.active$': true
           },
           include: [
             {
               model: models.account,
               as: `Account`,
-              attributes: [`email`, `active`],
-            },
-          ],
+              attributes: [`email`, `active`]
+            }
+          ]
         };
 
-        return datatable(models.customer, mockRelationalRequest, params)
-          .then((result) => {
-            expect(result.data).to.deep.equal(expected);
+        return datatable(models.customer, mockRelationalRequest, params).then(result => {
+          expect(result.data).to.deep.equal(expected);
 
-            return true;
-          });
+          return true;
+        });
       });
     });
   });

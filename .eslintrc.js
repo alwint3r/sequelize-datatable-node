@@ -1,18 +1,22 @@
 module.exports = {
-    "extends": "airbnb",
-    "installedESLint": true,
-    "plugins": [
-        "react",
-        "jsx-a11y",
-        "import"
-    ],
-    "env": {
-      "node": true,
-      "mocha": true,
-    },
-    "rules": {
-      "strict": 0,
-      "quotes": [2, `backtick`],
-      "comma-dangle": 0,
-    }
-};
+  "env": {
+    "node": true,
+    "mocha": true
+  },
+  "extends": ["airbnb", "prettier", "plugin:node/recommended"],
+  "plugins": ["promise","prettier"],
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "func-names": "off",
+    "no-process-exit": "off",
+    "object-shorthand": "off",
+    "class-methods-use-this": "off",
+    "no-continue": "off",
+    "no-await-in-loop": "warn"
+  }
+}

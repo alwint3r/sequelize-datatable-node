@@ -1,12 +1,18 @@
-Sequelize Datatables
+Sequelize Datatable
 ====================
 
-Server-side processing datatables with sequelize.
+Server-side datatables with Sequelize (works with Sequelize 3 and 4). 
 
 #### Support
 
 * Node.js v4 & later
-* Sequelize v3
+* Sequelize v5
+
+#### Instalation
+
+```
+npm install sequelize-datatables
+```
 
 #### API
 
@@ -30,12 +36,12 @@ This function takes three arguments to produce output for datatables.
 **Options**
 
 * `caseInsensitive: Boolean` - A flag for postgresql dialec. If this is set to `true`, `ILIKE` will be used instead of `LIKE` Default to `false`.
-
+* `replaceRegexp` - A workaround in case dialect does not support native regex, but you need to search for list of exact matches, passed as regex expression, `^((?!debug|info.*)$`. See working example: http://live.datatables.net/kopafape/1/edit
 
 #### Example Usage
 
 ```js
-const datatable = require(`sequelize-datatables`);
+const datatable = require(`sequelize-datatable`);
 const model = require(`./path/to/sequelize-model`); // Sequelize model
 
 // assuming you are using express
@@ -54,9 +60,10 @@ route.get(`/datasource`, (req, res) => {
  - [X] Test with postgresql database
  - [X] Test with mysql database
  - [X] Support global search
+ - [X] Support individual column search
  - [X] Support nested relation search & ordering
- - [ ] Test with another database server (mssql, sqlite)
- - [ ] Support individual column search
+ - [X] Test with another database server (sqlite)
+ - [ ] Test with another database server (mssql)
  - [ ] More tests!
 
 #### Testing
@@ -69,7 +76,11 @@ cd sequelize-datatable-node
 npm install
 
 # It's recommended to test this library using dockerized database engine
-npm run run-docker
+DIALECT=mysql npm run test:setup
+
+# or
+
+DIALECT=postgres npm run test:setup
 
 # on another terminal, enter command
 DIALECT=postgres npm test
@@ -78,14 +89,3 @@ DIALECT=postgres npm test
 
 DIALECT=mysql npm test
 ```
-
-## License
-
-The MIT License (MIT)
-Copyright (c) 2016 Alwin Arrasyid
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
