@@ -12,7 +12,7 @@ module.exports = [
   {
     email: `jane@janedoe.com`,
     password: crypto
-      .createHash(`sha`)
+      .createHash(`sha1`)
       .update(`janedoe`)
       .digest(`hex`),
     active: false

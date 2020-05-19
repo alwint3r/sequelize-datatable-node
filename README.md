@@ -64,7 +64,7 @@ route.get(`/datasource`, (req, res) => {
  - [X] Support nested relation search & ordering
  - [X] Test with another database server (sqlite)
  - [ ] Test with another database server (mssql)
- - [ ] More tests!
+ - [X] More tests!
 
 #### Testing
 
