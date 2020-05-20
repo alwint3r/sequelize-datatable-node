@@ -1,7 +1,7 @@
-Sequelize Datatable
+Sequelize Datatables
 ====================
 
-Server-side datatables with Sequelize (works with Sequelize 3 and 4). 
+Server-side datatables with Sequelize.
 
 #### Support
 
@@ -59,10 +59,10 @@ route.get(`/datasource`, (req, res) => {
 
  - [X] Test with postgresql database
  - [X] Test with mysql database
+ - [X] Test with sqlite database
  - [X] Support global search
  - [X] Support individual column search
  - [X] Support nested relation search & ordering
- - [X] Test with another database server (sqlite)
  - [ ] Test with another database server (mssql)
  - [X] More tests!
 
