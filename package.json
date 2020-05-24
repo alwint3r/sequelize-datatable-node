@@ -1,6 +1,6 @@
 {
   "name": "sequelize-datatables",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Server-side datatables with sequelize",
   "main": "src/index.js",
   "author": "Alwin Arrasyid <alwin.ridd@gmail.com>",
@@ -11,7 +11,7 @@
     "test": "test"
   },
   "engines": {
-    "node": "^8.3.0 || ^10"
+    "node": "^7.6.0 || ^10"
   },
   "files": [
     "dist",

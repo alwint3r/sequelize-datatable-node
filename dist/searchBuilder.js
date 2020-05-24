@@ -35,10 +35,10 @@ const charSearch = (modelName, modelDesc, config, opt, dialect) => {
     return isChar && nameMaps[item] && config.search.value;
   }).value();
 
-  let searchOp = opt.caseInsensitive && dialect !== 'mysql' ? Op.iLike : Op.like;
+  let searchOp = opt.caseInsensitive && dialect === 'postgres' ? Op.iLike : Op.like;
 
   let searchValue = `%${config.search.value}%`;
-  if (config.search.regex) {
+  if (config.search.regex === `true`) {
     if (['mysql', 'postgres'].includes(dialect) || opt.forceRegex) {
       searchOp = Op.regexp;
       searchValue = config.search.value;

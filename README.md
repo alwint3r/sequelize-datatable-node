@@ -5,7 +5,7 @@ Server-side datatables with Sequelize.
 
 #### Support
 
-* Node.js v4 & later
+* Node.js v7.6 & later
 * Sequelize v5
 
 #### Instalation

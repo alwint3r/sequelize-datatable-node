@@ -66,7 +66,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.search = {
           value: `Jane`,
-          regex: false
+          regex: `false`
         };
 
         const result = await datatable(models.customer, request, {});
@@ -79,7 +79,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.search = {
           value: 2,
-          regex: false
+          regex: `false`
         };
 
         const result = await datatable(models.customer, request, {});
@@ -102,7 +102,7 @@ describe(`datatable(model, config, params)`, function top() {
         });
         request.search = {
           value: 2,
-          regex: false
+          regex: `false`
         };
 
         const result = await datatable(models.customer, request, {});
@@ -115,7 +115,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.search = {
           value: `^(winter|summer)$`,
-          regex: true
+          regex: `true`
         };
 
         const result = await datatable(models.customer, request, {});
@@ -128,7 +128,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.search = {
           value: `^(winter|summer)$`,
-          regex: true
+          regex: `true`
         };
 
         const result = await datatable(models.customer, request, { replaceRegexp: true });
@@ -143,7 +143,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.columns[1].search = {
           value: `Jane`,
-          regex: false
+          regex: `false`
         };
 
         const result = await datatable(models.customer, request, {});
@@ -155,7 +155,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.columns[1].search = {
           value: `^(Jane|summer)$`,
-          regex: true
+          regex: `true`
         };
 
         const result = await datatable(models.customer, request, {});
@@ -167,7 +167,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.columns[1].search = {
           value: `^(Jane|summer)$`,
-          regex: true
+          regex: `true`
         };
 
         const result = await datatable(models.customer, request, { replaceRegexp: true });
@@ -182,7 +182,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.columns[1].search = {
           value: `Jane`,
-          regex: false
+          regex: `false`
         };
         request.search.value = `089876`;
 
@@ -196,7 +196,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.columns[1].search = {
           value: `Jane`,
-          regex: false
+          regex: `false`
         };
         request.search.value = `99999`;
 
@@ -210,7 +210,7 @@ describe(`datatable(model, config, params)`, function top() {
         const request = _.cloneDeep(mockRequest);
         request.columns[1].search = {
           value: `Janexx`,
-          regex: false
+          regex: `false`
         };
         request.search.value = `089876`;
 

@@ -1,5 +1,6 @@
 const _ = require(`lodash`);
 const models = require(`./models`);
+const helper = require(`../src/helper`);
 const { expect } = require(`chai`);
 const mockRelationalRequest = require(`./mocks/relational_request.json`);
 const datatable = require(`../`);
@@ -107,7 +108,7 @@ describe(` > 1 joined table`, function top() {
 describe(`Case insensitive search`, function top() {
   this.timeout(10000);
 
-  it(`Should not output error`, () => {
+  it(`PostgressSQL - should retrun 1 row, others - no results`, () => {
     const request = _.cloneDeep(mockRelationalRequest);
     request.columns.push({
       data: `Account.email`,
@@ -135,9 +136,10 @@ describe(`Case insensitive search`, function top() {
     const opt = {
       caseInsensitive: true
     };
+    const dialect = helper.getDialectFromModel(models.customer);
 
     return datatable(models.customer, request, params, opt).then(result => {
-      expect(result.data.length).to.not.equal(0);
+      expect(result.data.length).to.equal(dialect === 'postgres' ? 1 : 0);
 
       return true;
     });
