@@ -1,9 +1,11 @@
 Change log
 ===============
 
-### v2.1.0-0 - 2020-05-18
+### v3.0.0-0 - 2020-05-25
 
 * Add column search, regex search
+* Support for sequelize v5
+* Test with sqlite, added more tests
 
 ### v2.0.0-0 - 2018-05-29
 
