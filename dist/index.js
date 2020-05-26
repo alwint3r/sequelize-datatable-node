@@ -32,11 +32,7 @@ const search = async (model, config, modelName, opt) => {
   const dialect = helper.getDialectFromModel(model);
   const description = await describe(model);
 
-  return _.concat(
-    searchBuilder.charSearch(modelName, description, config, opt, dialect),
-    searchBuilder.numericSearch(modelName, description, config, opt),
-    searchBuilder.booleanSearch(modelName, description, config, opt)
-  );
+  return _.concat(searchBuilder.charSearch(modelName, description, config, opt, dialect), searchBuilder.numericSearch(modelName, description, config, opt), searchBuilder.booleanSearch(modelName, description, config, opt));
 };
 
 const buildSearch = async (model, config, params, opt) => {
@@ -64,9 +60,7 @@ const buildSearch = async (model, config, params, opt) => {
 const buildColumnSearch = async (model, config, params, opt) => {
   const options = opt;
   options.operator = Op.and;
-  const columnSearchs = config.columns.filter(
-    column => column.searchable === `true` && column.search.value !== `` && column.data !== ``
-  );
+  const columnSearchs = config.columns.filter(column => column.searchable === `true` && column.search.value !== `` && column.data !== ``);
   const result = await Promise.map(columnSearchs, column => {
     const fakeConfig = { columns: [column], search: column.search };
     return buildSearch(model, fakeConfig, params, options);
@@ -87,20 +81,18 @@ const buildOrder = (model, config, params) => {
     const splitted = col.split(`.`);
     const colName = splitted.pop();
 
-    const orders = _.compact(
-      _.map(splitted, modelName => {
-        const found = _.filter(leaves, leaf => leaf.as === modelName)[0];
+    const orders = _.compact(_.map(splitted, modelName => {
+      const found = _.filter(leaves, leaf => leaf.as === modelName)[0];
 
-        if (!found) {
-          return false;
-        }
+      if (!found) {
+        return false;
+      }
 
-        return {
-          model: found.model,
-          as: found.as
-        };
-      })
-    );
+      return {
+        model: found.model,
+        as: found.as
+      };
+    }));
 
     if (orders.length < 1) {
       return [];

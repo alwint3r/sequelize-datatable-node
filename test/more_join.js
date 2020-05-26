@@ -1,9 +1,7 @@
-'use strict';
-
-// const expect = require(`chai`).expect;
 const _ = require(`lodash`);
 const models = require(`./models`);
-const expect = require(`chai`).expect;
+const helper = require(`../src/helper`);
+const { expect } = require(`chai`);
 const mockRelationalRequest = require(`./mocks/relational_request.json`);
 const datatable = require(`../`);
 
@@ -20,28 +18,30 @@ describe(` > 1 joined table`, function top() {
         orderable: `true`,
         search: {
           value: ``,
-          regex: `false`,
-        },
+          regex: `false`
+        }
       });
 
-      request.order = [{
-        column: `${request.columns.length - 1}`,
-        dir: `asc`,
-      }];
+      request.order = [
+        {
+          column: `${request.columns.length - 1}`,
+          dir: `asc`
+        }
+      ];
 
       const params = {
         include: [
           {
             model: models.account,
             as: `Account`,
-            required: false,
+            required: false
           },
           {
             model: models.card,
             as: `Card`,
-            required: false,
-          },
-        ],
+            required: false
+          }
+        ]
       };
 
       return datatable(models.customer, request, params);
@@ -58,8 +58,8 @@ describe(` > 1 joined table`, function top() {
         orderable: `true`,
         search: {
           value: ``,
-          regex: `false`,
-        },
+          regex: `false`
+        }
       });
 
       request.search.value = `winter`;
@@ -69,9 +69,9 @@ describe(` > 1 joined table`, function top() {
           {
             model: models.account,
             as: `Account`,
-            required: false,
-          },
-        ],
+            required: false
+          }
+        ]
       };
 
       return datatable(models.customer, request, params);
@@ -86,8 +86,8 @@ describe(` > 1 joined table`, function top() {
         orderable: `true`,
         search: {
           value: ``,
-          regex: `false`,
-        },
+          regex: `false`
+        }
       });
 
       const params = {
@@ -95,9 +95,9 @@ describe(` > 1 joined table`, function top() {
           {
             model: models.card,
             as: `Card`,
-            required: true,
-          },
-        ],
+            required: true
+          }
+        ]
       };
 
       return datatable(models.customer, request, params);
@@ -108,7 +108,7 @@ describe(` > 1 joined table`, function top() {
 describe(`Case insensitive search`, function top() {
   this.timeout(10000);
 
-  it(`Should not output error`, () => {
+  it(`PostgressSQL - should retrun 1 row, others - no results`, () => {
     const request = _.cloneDeep(mockRelationalRequest);
     request.columns.push({
       data: `Account.email`,
@@ -117,8 +117,8 @@ describe(`Case insensitive search`, function top() {
       orderable: `true`,
       search: {
         value: ``,
-        regex: `false`,
-      },
+        regex: `false`
+      }
     });
 
     request.search.value = `ALWIN`;
@@ -128,20 +128,20 @@ describe(`Case insensitive search`, function top() {
         {
           model: models.account,
           as: `Account`,
-          required: false,
-        },
-      ],
+          required: false
+        }
+      ]
     };
 
     const opt = {
-      caseInsensitive: true,
+      caseInsensitive: true
     };
+    const dialect = helper.getDialectFromModel(models.customer);
 
-    return datatable(models.customer, request, params, opt)
-      .then((result) => {
-        expect(result.data.length).to.not.equal(0);
+    return datatable(models.customer, request, params, opt).then(result => {
+      expect(result.data.length).to.equal(dialect === 'postgres' ? 1 : 0);
 
-        return true;
-      });
+      return true;
+    });
   });
 });

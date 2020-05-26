@@ -4,13 +4,13 @@ module.exports = [
     name: `winter`,
     address: `Bandung`,
     phone: `08123456789`,
-    email: `alwin.ridd@gmail.com`,
+    email: `alwin.ridd@gmail.com`
   },
   {
     no: 2,
     name: `Jane`,
     address: `Jakarta`,
     phone: `08987654321`,
-    email: `jane@janedoe.com`,
-  },
+    email: `jane@janedoe.com`
+  }
 ];
