@@ -7,14 +7,10 @@
   "bugs": {
     "url": "https://github.com/alwint3r/sequelize-datatable-node/issues"
   },
-  "directories": {
-    "test": "test"
-  },
   "engines": {
     "node": "^7.6.0 || ^10"
   },
   "files": [
-    "dist",
     "src"
   ],
   "homepage": "https://github.com/alwint3r/sequelize-datatable-node/#readme",
@@ -28,10 +24,7 @@
     "url": "git+https://github.com/alwint3r/sequelize-datatable-node.git"
   },
   "scripts": {
-    "build": "babel src --out-dir dist",
-    "clean": "rimraf dist",
     "lint": "eslint src test",
-    "prepublish": "npm run clean && npm run lint && npm run build",
     "test": "mocha",
     "test:setup": "./initialize-database-container"
   },
