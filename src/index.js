@@ -74,12 +74,8 @@ const buildColumnSearch = async (model, config, params, opt) => {
   return result[0];
 };
 
-const buildOrder = (model, config, params) => {
-  if (!config.order) {
-    return [];
-  }
-
-  const order = config.order[0];
+const buildOrder = (index, config, params) => {
+  const order = config.order[index];
   const col = config.columns[order.column].data;
   const leaves = helper.dfs(params, [], []);
 
@@ -113,6 +109,20 @@ const buildOrder = (model, config, params) => {
   }
 
   return [helper.getColumnName(col), order.dir.toUpperCase()];
+}
+
+const buildOrders = (config, params) => {
+  if (!config.order) {
+    return [];
+  }
+
+  const orders = [];
+
+  for (let index = 0; index < config.order.length; ++index) {
+    orders.push(buildOrder(index, config, params));
+  }
+
+  return orders;
 };
 
 const getResult = async (model, config, modelParams, opt) => {
@@ -130,9 +140,9 @@ const getResult = async (model, config, modelParams, opt) => {
     [Op.and]: whereCondition
   };
 
-  const orderResult = await buildOrder(model, config, params);
+  const orderResult = buildOrders(config, params);
   if (orderResult.length > 0) {
-    params.order = [orderResult];
+    params.order = orderResult;
   }
 
   _.assign(params, paginate(config));
