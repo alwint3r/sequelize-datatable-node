@@ -140,7 +140,7 @@ const getResult = async (model, config, modelParams, opt) => {
     [Op.and]: whereCondition
   };
 
-  const orderResult = await buildOrders(model, config, params);
+  const orderResult = await buildOrders(config, params);
   if (orderResult.length > 0) {
     params.order = orderResult;
   }
