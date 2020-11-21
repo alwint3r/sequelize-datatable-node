@@ -2,6 +2,7 @@ Sequelize Datatables
 ====================
 
 Server-side datatables with Sequelize.
+This repository was originally forked from https://github.com/alwint3r/sequelize-datatable-node
 
 #### Support
 
